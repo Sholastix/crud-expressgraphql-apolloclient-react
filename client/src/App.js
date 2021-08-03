@@ -13,12 +13,6 @@ const App = () => {
             <Switch>
                 <Route exact path='/' component={Products} />
                 <Route path='/product/:id' component={ProductInfo} />
-                {/* <Route exact path='/'>
-                    <Products />
-                </Route>
-                <Route path='/product/:id'>
-                    <ProductInfo />
-                </Route> */}
             </Switch>
         </div>
     );

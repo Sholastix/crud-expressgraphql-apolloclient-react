@@ -21,3 +21,7 @@ Endpoint:
         http://localhost:xxxx/graphql
         
 (xxxx - your environment variable value in .env file).
+
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+ATTENTION! In repositorie's 'alternate' branch  exists version of this demo-project with usage of 'apollo-server'.

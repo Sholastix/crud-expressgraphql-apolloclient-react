@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button, Form, FormGroup, Input, Label, Modal, ModalHeader, ModalBody, ModalFooter, Table } from 'reactstrap';
-import { useQuery, useMutation } from '@apollo/client';
+import { useQuery, useMutation, gql } from '@apollo/client';
 
 import { GET_ALL_PRODUCTS, CREATE_PRODUCT, UPDATE_PRODUCT, DELETE_PRODUCT } from '../graphql/queries';
 
@@ -20,9 +20,44 @@ const Products = () => {
     const [editProductModal, setEditProductModal] = useState(false);
 
     const { data, loading } = useQuery(GET_ALL_PRODUCTS);
-    const [createProduct] = useMutation(CREATE_PRODUCT);
+
+    const [createProduct] = useMutation(CREATE_PRODUCT, {
+        update(cache, { data: { createProduct } }) {
+            cache.modify({
+                fields: {
+                    getProducts(existingProducts = []) {
+                        const newProductRef = cache.writeFragment({
+                            data: createProduct,
+                            fragment: gql`
+                                fragment NewProduct on GetAllProducts {
+                                    _id
+                                    name
+                                    price
+                                }
+                            `
+                        });
+                        return [...existingProducts, newProductRef];
+                    }
+                }
+            })
+        }
+    });
+
     const [updateProduct] = useMutation(UPDATE_PRODUCT);
-    const [deleteProduct] = useMutation(DELETE_PRODUCT);
+
+    const [deleteProduct] = useMutation(DELETE_PRODUCT, {
+        update(cache, { data: { deleteProduct } }) {
+            cache.modify({
+                fields: {
+                    getProducts(existingProducts = [], { readField }) {
+                        return existingProducts.filter(
+                            productRef => deleteProduct._id !== readField('_id', productRef)
+                        );
+                    }
+                }
+            })
+        }
+    });
 
     useEffect(() => {
         getProducts();
@@ -66,7 +101,7 @@ const Products = () => {
         };
     };
 
-    // EDIT - NOT FULLY WORKING YET
+    // EDIT
     const updateProductHandler = async () => {
         try {
             const result = await updateProduct({
