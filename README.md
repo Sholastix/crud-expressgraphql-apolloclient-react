@@ -1,4 +1,4 @@
-# crud-graphql-apolloclient-react
+# crud-expressgraphql-apolloclient-react
 
 Example of CRUD basic functionality in MongoDB with help of GraphQL.
 
